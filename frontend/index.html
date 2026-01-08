@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Field Review</title>
+  <style>
+    body { font-family: Arial; background: #f4f6f8; padding: 20px; }
+    .box { background: white; padding: 15px; margin-bottom: 15px; border-radius: 6px; }
+    textarea { width: 100%; min-height: 60px; }
+    button { padding: 10px 15px; margin-top: 10px; cursor: pointer; }
+    .image-card { border: 1px solid #ddd; padding: 10px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<h2>Field Review</h2>
+
+<div class="box">
+  <label>Discipline</label>
+  <select id="discipline">
+    <option>Electrical</option>
+    <option>Plumbing</option>
+    <option>Envelope</option>
+    <option>HVAC</option>
+  </select>
+
+  <label>Stage</label>
+  <select id="stage">
+    <option>Rough-In</option>
+    <option>Final</option>
+  </select>
+
+  <input type="file" id="photos" multiple accept="image/*" />
+  <button onclick="analyze()">Analyze Photos</button>
+</div>
+
+<div class="box">
+  <h3>AI Results (Editable)</h3>
+  <div id="results"></div>
+</div>
+
+<script>
+async function analyze() {
+  const files = document.getElementById("photos").files;
+  if (!files.length) return alert("Upload photos");
+
+  const formData = new FormData();
+  formData.append("discipline", document.getElementById("discipline").value);
+  formData.append("stage", document.getElementById("stage").value);
+
+  for (let f of files) formData.append("photos", f);
+
+  const res = await fetch("http://localhost:3000/analyze", {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await res.json();
+  renderResults(data);
+}
+
+function renderResults(data) {
+  const container = document.getElementById("results");
+  container.innerHTML = "";
+
+  data.images.forEach((img, i) => {
+    const div = document.createElement("div");
+    div.className = "image-card";
+    div.innerHTML = `
+      <strong>Image ${i + 1}</strong><br/>
+      <textarea>${img.description}</textarea>
+      <h4>Checklist</h4>
+      <textarea>${img.suggested_observations.join("\n")}</textarea>
+      <h4>Deficiencies</h4>
+      <textarea>${img.suggested_deficiencies.map(d => d.comment).join("\n")}</textarea>
+    `;
+    container.appendChild(div);
+  });
+}
+</script>
+
+</body>
+</html>
