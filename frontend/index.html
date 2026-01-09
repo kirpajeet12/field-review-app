@@ -1,37 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
   <title>AI Field Review</title>
   <style>
-    body { font-family: Arial; background: #f4f6f8; padding: 20px; }
-    .box { background: white; padding: 15px; margin-bottom: 15px; border-radius: 6px; }
-    textarea { width: 100%; min-height: 60px; }
-    button { padding: 10px 15px; margin-top: 10px; cursor: pointer; }
-    .image-card { border: 1px solid #ddd; padding: 10px; margin-top: 10px; }
+    body { font-family: Arial; background:#f4f6f8; padding:20px }
+    .box { background:#fff; padding:15px; margin-bottom:15px; border-radius:6px }
+    textarea { width:100%; min-height:70px }
+    button { padding:10px 15px; cursor:pointer }
+    .image { border:1px solid #ccc; padding:10px; margin-top:10px }
   </style>
 </head>
 <body>
 
-<h2>Field Review</h2>
+<h2>AI Field Review</h2>
 
 <div class="box">
-  <label>Discipline</label>
+  Discipline:
   <select id="discipline">
     <option>Electrical</option>
     <option>Plumbing</option>
     <option>Envelope</option>
-    <option>HVAC</option>
   </select>
 
-  <label>Stage</label>
+  Stage:
   <select id="stage">
     <option>Rough-In</option>
     <option>Final</option>
   </select>
 
-  <input type="file" id="photos" multiple accept="image/*" />
-  <button onclick="analyze()">Analyze Photos</button>
+  <br><br>
+  <input type="file" id="photos" multiple accept="image/*">
+  <br><br>
+  <button onclick="analyze()">Scan Photos</button>
 </div>
 
 <div class="box">
@@ -39,43 +39,53 @@
   <div id="results"></div>
 </div>
 
+<button onclick="generateReport()">Generate Report</button>
+
 <script>
+let aiData = null;
+
 async function analyze() {
   const files = document.getElementById("photos").files;
   if (!files.length) return alert("Upload photos");
 
-  const formData = new FormData();
-  formData.append("discipline", document.getElementById("discipline").value);
-  formData.append("stage", document.getElementById("stage").value);
+  const fd = new FormData();
+  fd.append("discipline", discipline.value);
+  fd.append("stage", stage.value);
+  for (let f of files) fd.append("photos", f);
 
-  for (let f of files) formData.append("photos", f);
+  const res = await fetch("/analyze", { method:"POST", body:fd });
+  aiData = await res.json();
 
-  const res = await fetch("http://localhost:3000/analyze", {
-    method: "POST",
-    body: formData
+  const r = document.getElementById("results");
+  r.innerHTML = "";
+
+  aiData.images.forEach((img,i)=>{
+    r.innerHTML += `
+      <div class="image">
+        <b>Image ${i+1}</b><br>
+        <textarea>${img.description}</textarea>
+        <b>Observations</b>
+        <textarea>${img.observations.join("\n")}</textarea>
+        <b>Deficiencies</b>
+        <textarea>${img.deficiencies.join("\n")}</textarea>
+      </div>`;
   });
-
-  const data = await res.json();
-  renderResults(data);
 }
 
-function renderResults(data) {
-  const container = document.getElementById("results");
-  container.innerHTML = "";
+async function generateReport(){
+  if(!aiData) return alert("Scan first");
 
-  data.images.forEach((img, i) => {
-    const div = document.createElement("div");
-    div.className = "image-card";
-    div.innerHTML = `
-      <strong>Image ${i + 1}</strong><br/>
-      <textarea>${img.description}</textarea>
-      <h4>Checklist</h4>
-      <textarea>${img.suggested_observations.join("\n")}</textarea>
-      <h4>Deficiencies</h4>
-      <textarea>${img.suggested_deficiencies.map(d => d.comment).join("\n")}</textarea>
-    `;
-    container.appendChild(div);
+  const res = await fetch("/report",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify(aiData)
   });
+
+  const blob = await res.blob();
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "field-review-report.txt";
+  a.click();
 }
 </script>
 
