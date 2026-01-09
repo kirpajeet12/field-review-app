@@ -8,7 +8,7 @@ const client = new OpenAI({
 async function run() {
   // Load test image
   const imageBase64 = fs.readFileSync(
-    "backend/test-assets/test.jpg",
+    "backend/test-assests/building 14 gravel.jpg",
     "base64"
   );
 
