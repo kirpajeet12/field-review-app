@@ -14,7 +14,7 @@ async function run() {
   // ✅ absolute path, no guessing
   const imagePath = path.join(
     __dirname,
-    "test-assets",
+    "test-assests",
     "building 14 gravel.jpg"
   );
 
