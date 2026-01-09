@@ -1,20 +1,33 @@
 import OpenAI from "openai";
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
 async function run() {
-  const imageBase64 = fs.readFileSync(
-    "backend/test-assets/test.jpg",
-    "base64"
+  // ✅ absolute path, no guessing
+  const imagePath = path.join(
+    __dirname,
+    "test-assets",
+    "building 14 gravel.jpg"
   );
 
-  const response = await client.responses.create({
-    // 🔑 THIS IS THE FIX
-    model: "wf_696132034a908190819c9f074d0b91a90077314",
+  console.log("Looking for image at:", imagePath);
 
+  if (!fs.existsSync(imagePath)) {
+    throw new Error("Image not found at resolved path");
+  }
+
+  const imageBase64 = fs.readFileSync(imagePath, "base64");
+
+  const response = await client.responses.create({
+    model: "wf_696132034a908190819c9f074d0b91a90077314",
     input: [
       {
         role: "user",
