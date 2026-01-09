@@ -43,7 +43,7 @@ FORMAT:
           },
           {
             type: "input_image",
-            image_url:"https://raw.githubusercontent.com/kirpajeet12/field-review-app/main/backend/test-assets/building14gravel.jpg"
+            image_url:"https://raw.githubusercontent.com/kirpajeet12/field-review-app/main/backend/test-assests/building14gravel.jpg"
 
           }
         ]
