@@ -28,7 +28,6 @@ async function run() {
 
 const response = await client.responses.create({
   model: "wf_696132034a908190819c9f074d0b91a90077314",
-
   input: [
     {
       role: "user",
@@ -39,14 +38,15 @@ const response = await client.responses.create({
         },
         {
           type: "input_image",
-          image_url: `data:image/jpeg;base64,${imageBase64}`
+          image_url: "https://upload.wikimedia.org/wikipedia/commons/3/3f/House_under_construction.jpg"
         }
       ]
     }
   ]
 });
 
-console.log("AGENT OUTPUT:");
+console.log(response.output_text);
+
 console.log(response.output_text);
 
 
