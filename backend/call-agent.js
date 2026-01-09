@@ -6,15 +6,15 @@ const client = new OpenAI({
 });
 
 async function run() {
-  // Load test image
   const imageBase64 = fs.readFileSync(
-    "backend/test-assests/building 14 gravel.jpg",
+    "backend/test-assets/test.jpg",
     "base64"
   );
 
-  // Call your OpenAI Agent (Workflow)
   const response = await client.responses.create({
-    workflow: "wf_696132034a908190819c9f074d0b91a90077314", // 👈 YOUR WORKFLOW ID
+    // 🔑 THIS IS THE FIX
+    model: "wf_696132034a908190819c9f074d0b91a90077314",
+
     input: [
       {
         role: "user",
