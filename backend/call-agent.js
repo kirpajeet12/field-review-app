@@ -26,7 +26,7 @@ async function run() {
 
   const imageBase64 = fs.readFileSync(imagePath, "base64");
 
- const response = await client.responses.create({
+const response = await client.responses.create({
   model: "wf_696132034a908190819c9f074d0b91a90077314",
 
   input: [
@@ -34,21 +34,24 @@ async function run() {
       role: "user",
       content: [
         {
-          type: "input_text",   // ✅ FIXED
+          type: "input_text",
           text: "Discipline: Electrical\nStage: Rough-In"
         },
         {
           type: "input_image",
-          image_base64: imageBase64
+          image_url: {
+            url: `data:image/jpeg;base64,${imageBase64}`
+          }
         }
       ]
     }
   ]
 });
 
+console.log("AGENT OUTPUT:");
+console.log(response.output_text);
 
-  console.log("AGENT OUTPUT:");
-  console.log(response.output_text);
+
 }
 
 run();
