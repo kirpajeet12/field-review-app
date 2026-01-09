@@ -43,7 +43,7 @@ FORMAT:
           },
           {
             type: "input_image",
-            image_url: "https://upload.wikimedia.org/wikipedia/commons/3/3f/House_under_construction.jpg"
+            image_url:"https://www.istockphoto.com/photos/electricity-damage"
           }
         ]
       }
