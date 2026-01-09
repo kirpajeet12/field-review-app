@@ -25,4 +25,4 @@ jobs:
         run: npm install
 
       - name: Run AI image test
-        run: node backend/action-test.js
+        run: node backend/call-agent.js
